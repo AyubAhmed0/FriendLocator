@@ -15,10 +15,10 @@ class Database {
      * @return Database
      */
     public static function getInstance() {
-        $username ='agd861';
-        $password = 'root.883';
-        $host = 'poseidon.salford.ac.uk';
-        $dbName = 'agd861';
+        $username ='ar6363';
+        $password = 'djFS37/.k/';
+        $host = 'com.salford.ac.uk';
+        $dbName = 'ar6363';
 
         if(self::$_dbInstance === null) { //checks if the PDO exists
             // creates new instance if not, sending in connection info
