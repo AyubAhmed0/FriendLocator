@@ -1,0 +1,72 @@
+<?php require('Views/template/header.phtml') ?>
+<?php require('Views/template/loginmodal.phtml') ?>
+<?php require('Views/template/logoutmodal.phtml') ?>
+<?php
+        $token = substr(str_shuffle(MD5(microtime())), 0, 20);
+        $_SESSION["ajaxToken"] = $token;
+    ?>
+<head>
+<script type="text/javascript">
+    var phpVars = <?php echo json_encode($token) ?>;
+</script>
+    <script src="js/ajaxlivesearch.js"></script>
+</head>
+<div class="container">
+<form class="d-flex w-25 mt-1" method="post" action="">                 
+    <input class="form-control me-2" type="search" name="searchValue" placeholder="Search" aria-label="Search" onkeyup="showHint(this.value)">
+    <button class="btn btn-outline-success" name="searchbutton" type="submit">Search</button>   
+          
+ </form>
+ <div class="list-group" id="hint"></div>
+
+    <table class="table table-hover">
+        <thead> <tr> <th>UserID</th> <th>Username</th> <th>Profile Picture</th> 
+        <?php
+                if (isset($_SESSION["login"])) //if login session doesn't exist/if the user is not logged in
+                {
+                  echo '
+                    <th>Email</th><th>Fullname</th>
+                    <th>Latitude</th> <th>Longitude</th> <th></th>';
+                }
+             ?>
+         </tr>
+        </thead>
+
+        <tbody>
+        <?php
+                if (isset($_SESSION["login"])) //if login session exists/if the user is logged in
+                {
+                    $user = $_SESSION["id"]; //this user
+                foreach ($view->UsersDataSet as $userData) { //for each user
+                    echo '<tr>' .
+                        '</td> <td>' . $userData->getUserID() .
+                        '</td> <td>' . $userData->getUsername() .
+                        '</td> <td>' . '<img width="100px" src="' . $userData->getImage() . '">' . 
+                        '</td> <td>' . $userData->getEmail() .
+                        '</td> <td>' . $userData->getFullname() .
+                        '</td> <td>' . $userData->getLat() .
+                        '</td> <td>' . $userData->getLng() .
+                        '</td> <td>
+                        <form method="post" action="friendsFunctions.php">
+                              <input type="submit" name="RequestButon" value="Request Friend"class="btn btn-primary">
+                              <input type="hidden" name="friendRequestName" value="'.$userData->getUsername().'">
+                              <input type="hidden" name="requestingfriend" value="'.$user.'"> 
+                              <input type="hidden" name="requestedfriend" value="'.$userData->getUserID().'">
+                              </form>
+                        </td> </td> </tr>';
+                }
+            }
+            else {
+                foreach ($view->UsersDataSet as $userData) {
+                echo '<tr>' .
+                        '</td> <td>' . $userData->getUserID() .
+                        '</td> <td>' . $userData->getUsername() .
+                        '</td> <td>' . '<img width="100px" src="' . $userData->getImage() . '">' . 
+                        '</td> </td> </tr>';
+            }
+        }
+         ?>
+        </tbody>
+    </table>
+</div>
+<?php require('Views/template/footer.phtml') ?>

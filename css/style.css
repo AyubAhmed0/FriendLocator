@@ -1,0 +1,22 @@
+.signup-form {
+    height: 100vh;
+    background-color: rgb(235, 235, 235);
+}
+
+.form-control {
+    height: 45px;
+    border-radius: 20px
+}
+
+.form-control:focus {
+    box-shadow: none
+}
+
+.btn-signup {
+    height: 50px;
+    border-radius: 10px
+}
+.profile-pic {
+    border-radius: 15px 50px 150px 150px;
+    
+}

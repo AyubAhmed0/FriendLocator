@@ -1,0 +1,29 @@
+<link href="../clientserversys/css/bootstrap.css" rel="stylesheet">
+ <!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="">
+            <div class="modal-header">
+                <h5 class="modal-title">Login</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="Username">Username<span class="text-danger">*</span></label>
+                    <input type="text" name="username" class="form-control" id="Username" placeholder="Enter Username">
+                </div>
+
+                <div class="mb-3">
+                    <label for="Password">Password<span class="text-danger">*</span></label>
+                    <input type="password" name="password" class="form-control" id="Password" placeholder="Enter Password">
+                </div>
+            </div>
+            <div class="modal-footer pt-4">
+                <button type="submit" name="loginbutton" value="Login" class="btn btn-primary mx-auto w-100">Login</button>
+            </div>
+            <p class="text-center">Not yet account, <a href="Views\signup.phtml">Signup</a></p>
+            </form>
+        </div>
+    </div>
+</div>

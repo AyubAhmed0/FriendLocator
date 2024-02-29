@@ -1,0 +1,167 @@
+<?php require('template/header.phtml') ?>
+<?php require('template/loginmodal.phtml') ?>
+<?php require('template/logoutmodal.phtml') ?>
+<div class="container">
+    <table class="table table-hover">
+        <thead> <tr><th>FriendID</th> <th>Username</th> <th>Profile Picture</th>
+        <th>Email</th><th>Fullname</th> <th>Latitude</th> <th>Longitude</th> <th>Status</th></tr> 
+        </thead>
+        <tbody>
+<?php
+                   if (isset($_SESSION["login"])) { //if the user is logged in
+                  $user = $_SESSION["id"];
+                  foreach ($view->UsersDataSet as $userData) { //for each user
+                    switch($userData->getStatus())
+                    {
+                      case 1: 
+                        {
+                          if($user == $userData->getFriend1()) //this user made the request
+                          {
+                            echo '<tr>' .
+                            '</td> <td>' . $userData->getUserID() .
+                            '</td> <td>' . $userData->getUsername() .
+                            '</td> <td>' . '<img width="100px" src="' . $userData->getImage() . '">' . 
+                            '</td> <td>' . $userData->getEmail() .
+                            '</td> <td>' . $userData->getFullname() .
+                            '</td> <td>' . $userData->getLat() .
+                            '</td> <td>' . $userData->getLng() .
+                            '</td> <td> You requested..
+                             <form method="post" action="friendsFunctions.php">
+                              <input type="submit" name="RequestButon" value="Cancel request"class="btn btn-danger">
+                              <input type="hidden" name="friendRequestName" value="'.$userData->getUsername().'">
+                              <input type="hidden" name="friendRequestID" value="'.$userData->getFId().'"> 
+                              </form>
+                            </td></td> </tr>';
+                        }
+
+                        if($user == $userData->getFriend2()) //another user made the request
+                          {
+                            echo '<tr>' .
+                            '</td> <td>' . $userData->getUserID() .
+                            '</td> <td>' . $userData->getUsername() .
+                            '</td> <td>' . '<img width="100px" src="' . $userData->getImage() . '">' . 
+                            '</td> <td>' . $userData->getEmail() .
+                            '</td> <td>' . $userData->getFullname() .
+                            '</td> <td>' . $userData->getLat() .
+                            '</td> <td>' . $userData->getLng() .
+                            '</td> <td> 
+                             <form method="post" action="friendsFunctions.php">
+                              <input type="submit" name="RequestButon" value="Accept request"class="btn btn-primary mb-1">
+                              <input type="hidden" name="friendRequestName" value="'.$userData->getUsername().'">
+                              <input type="hidden" name="friendRequestID" value="'.$userData->getFId().'">
+                              <input type="hidden" name="requestingfriend" value="'.$userData->getFriend1().'">
+                              <input type="hidden" name="acceptingfriend" value="'.$userData->getFriend2().'"> 
+                              </form>
+
+                              <form method="post" action="friendsFunctions.php">
+                              <input type="submit" name="RequestButon" value="Cancel request"class="btn btn-danger">
+                              <input type="hidden" name="friendRequestName" value="'.$userData->getUsername().'">
+                              <input type="hidden" name="friendRequestID" value="'.$userData->getFId().'">
+                              </form>
+                            </td></td> </tr>';
+        
+                        }
+                    } break;
+                    case 2:
+                      echo '<tr>' .
+                            '</td> <td>' . $userData->getUserID() .
+                            '</td> <td>' . $userData->getUsername() .
+                            '</td> <td>' . '<img width="100px" src="' . $userData->getImage() . '">' . 
+                            '</td> <td>' . $userData->getEmail() .
+                            '</td> <td>' . $userData->getFullname() .
+                            '</td> <td>' . $userData->getLat() .
+                            '</td> <td>' . $userData->getLng() .
+                            '</td> <td> Friends
+                            <form method="post" action="friendsFunctions.php">
+                              <input type="submit" name="RequestButon" value="Remove Friend"class="btn btn-danger">
+                              <input type="hidden" name="friendRequestName" value="'.$userData->getUsername().'">
+                              <input type="hidden" name="friendRequestID" value="'.$userData->getFId().'">
+                              </form>
+                            </td></td> </tr>';
+
+
+                  }
+                }
+          }
+                  
+                ?>
+                <h1>You Friends List</h1>
+          </tbody>
+    </table>
+</div>
+<div id="output"></div>
+    <div id="Map" style="width:1920px;height:600px"></div>
+    <script>
+        //starting lat and lon of the current user from DBS
+        var currentLat = <?php echo $currentUser['lat']; ?>;
+        var currentLong = <?php echo $currentUser['lng']; ?>;
+        //console.log(currentLat + "-=" +  currentLong);
+        var vectorLayer = new OpenLayers.Layer.Vector("Overlay");
+        map = new OpenLayers.Map("Map");
+        var fromProjection = new OpenLayers.Projection("EPSG:4326"); // Transform from WGS 1984
+        var toProjection = new OpenLayers.Projection("EPSG:900913"); //to Spherical Mercator Projection
+        var position = new OpenLayers.LonLat(currentLong, currentLat).transform(fromProjection, toProjection);
+        var zoom = 1;
+        var mapnik = new OpenLayers.Layer.OSM();
+        map.addLayer(mapnik);
+        map.setCenter(position, zoom);
+        var markers = new OpenLayers.Layer.Markers("Markers");
+        map.addLayer(markers);
+        // Define markers as "features" of the vector layer:
+        var loggedInUserMarker = new OpenLayers.Feature.Vector(
+            new OpenLayers.Geometry.Point(currentLong, currentLat).transform(fromProjection, toProjection),
+            {description: 'This is your location.'},
+            {
+                externalGraphic: 'images/map-pin.png',
+                graphicHeight: 30,
+                graphicWidth: 30,
+                graphicXOffset: -12,
+                graphicYOffset: -25
+            }
+        );
+        
+        vectorLayer.addFeatures(loggedInUserMarker);
+        <?php
+        foreach ($view->UsersDataSet as $userData) {
+                echo "var feature = new OpenLayers.Feature.Vector(\n\tnew OpenLayers.Geometry.Point(";
+                echo $userData->getLng() . ',' . $userData->getLat();
+                echo ").transform(fromProjection, toProjection),
+                                {description:\"<h1>" . $userData->getFullName() . "</h1>\" + \"<br>\" + '<img src=\"" . $userData->getImage() . "\" width=100'} ,
+                                {externalGraphic: '" . $userData->getImage() . "', graphicHeight: 30, graphicWidth: 30, graphicXOffset:-12, graphicYOffset:-25  });
+                                vectorLayer.addFeatures(feature);\n\n";
+            }
+        ?>
+        map.addLayer(vectorLayer);
+        
+        //Add a selector control to the vectorLayer with popup functions
+        var controls = {
+            selector: new OpenLayers.Control.SelectFeature(vectorLayer, {
+                onSelect: createPopup,
+                onUnselect: destroyPopup
+            })
+        };
+
+        function createPopup(feature) {
+            feature.popup = new OpenLayers.Popup.FramedCloud("pop",
+                feature.geometry.getBounds().getCenterLonLat(),
+                null,
+                '<div class="markerContent">' + feature.attributes.description + '</div>',
+                null,
+                true,
+                function () {
+                    controls['selector'].unselectAll();
+                }
+            );
+            map.addPopup(feature.popup);
+        }
+
+        function destroyPopup(feature) {
+            feature.popup.destroy();
+            feature.popup = null;
+        }
+
+        map.addControl(controls['selector']);
+        controls['selector'].activate();
+       
+    </script>
+<?php require('template/footer.phtml') ?>
